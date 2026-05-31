@@ -8,7 +8,8 @@ if (!payloadPath) {
   throw new Error("Usage: node scripts/update-tradepedia-entry.mjs payload.json");
 }
 
-const payload = JSON.parse(fs.readFileSync(payloadPath, "utf8"));
+const rawPayload = JSON.parse(fs.readFileSync(payloadPath, "utf8"));
+const payload = rawPayload.entry || rawPayload;
 validatePayload(payload);
 
 const sourceHtml = fs.readFileSync(contentPath, "utf8");

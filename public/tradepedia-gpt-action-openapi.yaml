@@ -30,53 +30,58 @@ paths:
                 client_payload:
                   type: object
                   required:
-                    - title
-                    - kind
-                    - category
-                    - summary
-                    - body
+                    - entry
                   properties:
-                    id:
-                      type: string
-                      description: Optional stable slug. If omitted, generated from title.
-                    title:
-                      type: string
-                      description: Article title shown in Tradepedia.
-                    kind:
-                      type: string
-                      description: Type such as Kavram, Indikator, Formasyon, Emir Tipi.
-                    category:
-                      type: string
-                      description: Category such as Momentum, Risk, Hacim, Piyasa Yapisi.
-                    level:
-                      type: string
-                      description: Optional level such as Baslangic, Orta, Ileri.
-                    tags:
-                      type: array
-                      items:
-                        type: string
-                    summary:
-                      type: string
-                      description: Short article summary.
-                    body:
-                      type: string
-                      description: Main article body. Plain text is preferred.
-                    usage:
-                      type: string
-                      description: Optional usage notes.
-                    pitfalls:
-                      type: string
-                      description: Optional common mistakes.
-                    botNote:
-                      type: string
-                      description: Optional bot or backtest note.
-                    related:
-                      type: array
-                      items:
-                        type: string
-                    replaceExisting:
-                      type: boolean
-                      default: true
+                    entry:
+                      type: object
+                      required:
+                        - title
+                        - kind
+                        - category
+                        - summary
+                        - body
+                      properties:
+                        id:
+                          type: string
+                          description: Optional stable slug. If omitted, generated from title.
+                        title:
+                          type: string
+                          description: Article title shown in Tradepedia.
+                        kind:
+                          type: string
+                          description: Type such as Kavram, Indikator, Formasyon, Emir Tipi.
+                        category:
+                          type: string
+                          description: Category such as Momentum, Risk, Hacim, Piyasa Yapisi.
+                        level:
+                          type: string
+                          description: Optional level such as Baslangic, Orta, Ileri.
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                        summary:
+                          type: string
+                          description: Short article summary.
+                        body:
+                          type: string
+                          description: Main article body. Plain text is preferred.
+                        usage:
+                          type: string
+                          description: Optional usage notes.
+                        pitfalls:
+                          type: string
+                          description: Optional common mistakes.
+                        botNote:
+                          type: string
+                          description: Optional bot or backtest note.
+                        related:
+                          type: array
+                          items:
+                            type: string
+                        replaceExisting:
+                          type: boolean
+                          default: true
       responses:
         "204":
           description: GitHub accepted the update request. The workflow will update and publish Tradepedia.
