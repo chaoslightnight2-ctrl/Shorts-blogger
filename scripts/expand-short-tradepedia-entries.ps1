@@ -2,7 +2,8 @@ param(
     [string]$HtmlPath = "public/content.html",
     [string]$FallbackPath = "app/src/main/assets/fallback.html",
     [string]$ReviewPath = "reports/auto_wikipedia_review.csv",
-    [string]$Status = "too_short"
+    [string]$Status = "too_short",
+    [switch]$AllNonPass
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,6 +29,13 @@ function ConvertTo-PageArray {
 function Html-Encode {
     param([string]$Text)
     [System.Net.WebUtility]::HtmlEncode([string]$Text)
+}
+
+function Remove-ExistingExpansion {
+    param($Page)
+    $id = [regex]::Escape([string]$Page.id)
+    $pattern = "<section id=""$id-genis-aciklama"">[\s\S]*?<section id=""$id-dikkat"">[\s\S]*?</section>"
+    $Page.html = [regex]::Replace($Page.html, $pattern, "")
 }
 
 function Get-FocusText {
@@ -117,9 +125,7 @@ function New-ExpansionHtml {
 function Add-Expansion {
     param($Page, $ReviewRow)
     $id = [string]$Page.id
-    if ($Page.html -match ([regex]::Escape("$id-genis-aciklama"))) {
-        return $false
-    }
+    Remove-ExistingExpansion -Page $Page
 
     $expansion = New-ExpansionHtml -Page $Page -ReviewRow $ReviewRow
     $insertPatterns = @(
@@ -141,7 +147,11 @@ function Add-Expansion {
 $html = Get-Content -LiteralPath $HtmlPath -Raw -Encoding UTF8
 $match = Get-PageDataMatch -Html $html
 $pages = ConvertTo-PageArray -Json $match.Groups[1].Value
-$reviewRows = Import-Csv -LiteralPath $ReviewPath | Where-Object { $_.review_status -eq $Status }
+$reviewRows = if ($AllNonPass) {
+    Import-Csv -LiteralPath $ReviewPath | Where-Object { $_.review_status -ne "pass" }
+} else {
+    Import-Csv -LiteralPath $ReviewPath | Where-Object { $_.review_status -eq $Status }
+}
 $reviewById = @{}
 foreach ($row in $reviewRows) {
     $reviewById[$row.id] = $row
