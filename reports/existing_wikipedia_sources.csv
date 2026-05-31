@@ -56,7 +56,7 @@
 "hammer","Hammer","Mum Formasyonu","Candlestick","3","https://en.wikipedia.org/wiki/Hammer_(candlestick_pattern) https://en.wikipedia.org/wiki/Technical_analysis https://en.wikipedia.org/wiki/Trading_strategy"
 "head-and-shoulders","Head and Shoulders","Formasyon","Chart Pattern","3","https://en.wikipedia.org/wiki/Head_and_shoulders_(chart_pattern) https://en.wikipedia.org/wiki/Technical_analysis https://en.wikipedia.org/wiki/Trading_strategy"
 "heikin-ashi","Heikin Ashi","İndikatör","Fiyat Görselleştirme","2","https://en.wikipedia.org/wiki/Moving_average https://en.wikipedia.org/wiki/Technical_indicator"
-"hft-high-frequency-trading","HFT ? High-Frequency Trading","Kavram","Piyasa Yapisi","0",""
+"hft-high-frequency-trading","HFT (High-Frequency Trading)","Kavram","Piyasa Yapisi","3","https://en.wikipedia.org/wiki/Algorithmic_trading https://en.wikipedia.org/wiki/High-frequency_trading https://en.wikipedia.org/wiki/Market_microstructure"
 "stocks","Hisse Senedi","Piyasa","Enstrüman","3","https://en.wikipedia.org/wiki/Stock https://en.wikipedia.org/wiki/Technical_analysis https://en.wikipedia.org/wiki/Trading_strategy"
 "historical-vol","Historical Volatility","İndikatör","Risk / Volatilite","1","https://en.wikipedia.org/wiki/Volatility_(finance)"
 "hma","HMA — Hull Moving Average","İndikatör","Trend","2","https://en.wikipedia.org/wiki/Moving_average https://en.wikipedia.org/wiki/Technical_indicator"
