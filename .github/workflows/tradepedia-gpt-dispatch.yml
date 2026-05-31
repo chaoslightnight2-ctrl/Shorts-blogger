@@ -26,6 +26,12 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: tradepedia-gpt-update
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -64,6 +70,7 @@ jobs:
         run: node scripts/update-tradepedia-entry.mjs /tmp/tradepedia-payload.json
 
       - name: Commit update
+        id: commit_update
         shell: bash
         run: |
           git config user.name "tradepedia-gpt-bot"
@@ -71,8 +78,24 @@ jobs:
           git add public/content.html app/src/main/assets/fallback.html
           if git diff --cached --quiet; then
             echo "No Tradepedia changes to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          title="$(node -e "const p=require('/tmp/tradepedia-payload.json'); console.log(String(p.title || 'entry').slice(0,80))")"
+          title="$(node -e "const p=require('/tmp/tradepedia-payload.json'); const e=p.entry || p; console.log(String(e.title || 'entry').slice(0,80))")"
           git commit -m "Update Tradepedia entry: ${title}"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Pages
+        if: steps.commit_update.outputs.changed == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload public content
+        if: steps.commit_update.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        if: steps.commit_update.outputs.changed == 'true'
+        uses: actions/deploy-pages@v4
