@@ -29,9 +29,7 @@ function Add-LinkInTextOnly {
 
     if ($TargetId -eq $CurrentId) { return @{ html = $Html; changed = $false } }
     if ($Html.Contains("href=""#$TargetId""")) { return @{ html = $Html; changed = $false } }
-    if (-not $Html.Contains($Term)) { return @{ html = $Html; changed = $false } }
-
-    $pattern = "(?<![A-Za-zÇĞİÖŞÜçğıöşü])$([regex]::Escape($Term))(?![A-Za-zÇĞİÖŞÜçğıöşü])"
+    $pattern = "(?i)(?<![A-Za-zÇĞİÖŞÜçğıöşü])$([regex]::Escape($Term))(?![A-Za-zÇĞİÖŞÜçğıöşü])"
     $parts = [regex]::Split($Html, '(<a\b[\s\S]*?</a>|<[^>]+>)')
 
     for ($i = 0; $i -lt $parts.Count; $i++) {
