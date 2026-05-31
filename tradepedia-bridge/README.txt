@@ -1,0 +1,1 @@
+Tradepedia bridge file for Codex handoff.
