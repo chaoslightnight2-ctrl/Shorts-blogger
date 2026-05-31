@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Tradepedia Updater
+  version: 1.0.0
+  description: Add or update Tradepedia entries in the GitHub Pages content file.
+servers:
+  - url: https://YOUR-WORKER-DOMAIN.workers.dev
+paths:
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Check whether the Tradepedia updater is online.
+      responses:
+        "200":
+          description: Updater status.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+  /entries:
+    post:
+      operationId: addOrUpdateTradepediaEntry
+      summary: Add or update one Tradepedia article.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - kind
+                - category
+                - summary
+                - body
+              properties:
+                id:
+                  type: string
+                  description: Optional stable slug. If omitted, generated from title.
+                title:
+                  type: string
+                  description: Article title shown in Tradepedia.
+                kind:
+                  type: string
+                  description: Type such as Kavram, Indikator, Formasyon, Emir Tipi.
+                category:
+                  type: string
+                  description: Category such as Momentum, Risk, Hacim, Piyasa Yapisi.
+                level:
+                  type: string
+                  description: Optional level such as Baslangic, Orta, Ileri.
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: Optional short tags.
+                summary:
+                  type: string
+                  description: Short article summary.
+                body:
+                  type: string
+                  description: Main article body. Plain text is preferred.
+                usage:
+                  type: string
+                  description: Optional usage notes.
+                pitfalls:
+                  type: string
+                  description: Optional common mistakes.
+                botNote:
+                  type: string
+                  description: Optional bot or backtest note.
+                related:
+                  type: array
+                  items:
+                    type: string
+                  description: Optional related existing article titles or slugs.
+                replaceExisting:
+                  type: boolean
+                  default: true
+                  description: Replace an existing entry with the same id.
+      responses:
+        "200":
+          description: Entry added or updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  action:
+                    type: string
+                  count:
+                    type: integer
+                  contentUrl:
+                    type: string
+                  commit:
+                    type: string
+        "401":
+          description: Missing or invalid bearer token.
+        "409":
+          description: Existing entry conflict.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

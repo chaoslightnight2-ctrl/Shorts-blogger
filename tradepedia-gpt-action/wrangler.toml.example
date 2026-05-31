@@ -1,0 +1,8 @@
+name = "tradepedia-gpt-action"
+main = "worker.js"
+compatibility_date = "2026-05-31"
+
+[vars]
+GITHUB_OWNER = "chaoslightnight2-ctrl"
+GITHUB_REPO = "Shorts-blogger"
+GITHUB_BRANCH = "main"
