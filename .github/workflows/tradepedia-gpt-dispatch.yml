@@ -1,0 +1,78 @@
+name: Tradepedia GPT update
+
+on:
+  repository_dispatch:
+    types:
+      - tradepedia-entry
+  workflow_dispatch:
+    inputs:
+      title:
+        description: Article title
+        required: true
+      kind:
+        description: Article kind
+        required: true
+        default: Kavram
+      category:
+        description: Article category
+        required: true
+        default: Genel
+      summary:
+        description: Short summary
+        required: true
+      body:
+        description: Main article body
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build payload file
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CLIENT_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          INPUT_TITLE: ${{ github.event.inputs.title }}
+          INPUT_KIND: ${{ github.event.inputs.kind }}
+          INPUT_CATEGORY: ${{ github.event.inputs.category }}
+          INPUT_SUMMARY: ${{ github.event.inputs.summary }}
+          INPUT_BODY: ${{ github.event.inputs.body }}
+        run: |
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            printf '%s' "$CLIENT_PAYLOAD" > /tmp/tradepedia-payload.json
+          else
+            node - <<'NODE' > /tmp/tradepedia-payload.json
+          const payload = {
+            title: process.env.INPUT_TITLE,
+            kind: process.env.INPUT_KIND,
+            category: process.env.INPUT_CATEGORY,
+            summary: process.env.INPUT_SUMMARY,
+            body: process.env.INPUT_BODY
+          };
+          process.stdout.write(JSON.stringify(payload));
+          NODE
+          fi
+
+      - name: Update Tradepedia files
+        run: node scripts/update-tradepedia-entry.mjs /tmp/tradepedia-payload.json
+
+      - name: Commit update
+        shell: bash
+        run: |
+          git config user.name "tradepedia-gpt-bot"
+          git config user.email "tradepedia-gpt-bot@users.noreply.github.com"
+          git add public/content.html app/src/main/assets/fallback.html
+          if git diff --cached --quiet; then
+            echo "No Tradepedia changes to commit."
+            exit 0
+          fi
+          title="$(node -e "const p=require('/tmp/tradepedia-payload.json'); console.log(String(p.title || 'entry').slice(0,80))")"
+          git commit -m "Update Tradepedia entry: ${title}"
+          git push

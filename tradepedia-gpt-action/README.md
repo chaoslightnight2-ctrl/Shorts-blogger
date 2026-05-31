@@ -2,6 +2,51 @@
 
 This package lets a Custom GPT update Tradepedia from ChatGPT on mobile.
 
+## Recommended free mobile setup
+
+Use `openapi-github-free.yaml`. This does not need Cloudflare, Vercel, Netlify, or a paid server.
+
+Flow:
+
+1. ChatGPT calls GitHub's `repository_dispatch` API.
+2. GitHub Actions runs `.github/workflows/tradepedia-gpt-dispatch.yml`.
+3. The workflow updates `public/content.html` and `app/src/main/assets/fallback.html`.
+4. The existing Pages workflow publishes the new `content.html`.
+
+Custom GPT setup:
+
+1. Create a fine-grained GitHub token for this repository.
+2. Give it read/write repository contents access.
+3. In the GPT editor, add an Action.
+4. Paste `openapi-github-free.yaml`.
+5. Set authentication to API key / Bearer and paste the GitHub token.
+6. On mobile, use that Custom GPT and say what article to add.
+
+Prompt example:
+
+```text
+Tradepedia'ya ICT Fair Value Gap maddesi ekle.
+Tür: Kavram. Kategori: Price Action. Seviye: Orta.
+Özet, kullanım, hatalı kullanım ve bot/backtest notu da yaz.
+```
+
+The GPT must call `addOrUpdateTradepediaEntry` with:
+
+```json
+{
+  "event_type": "tradepedia-entry",
+  "client_payload": {
+    "title": "ICT Fair Value Gap",
+    "kind": "Kavram",
+    "category": "Price Action",
+    "summary": "...",
+    "body": "..."
+  }
+}
+```
+
+## Optional Worker setup
+
 Flow:
 
 1. The GPT calls the action endpoint.
