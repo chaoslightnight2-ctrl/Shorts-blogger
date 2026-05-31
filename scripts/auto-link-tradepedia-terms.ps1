@@ -5,6 +5,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function S {
+    param([int[]]$Codepoints)
+    return -join ($Codepoints | ForEach-Object { [string][char]$_ })
+}
+
 function Get-PageDataMatch {
     param([string]$Html)
     $match = [regex]::Match($Html, '<script id="pageData" type="application/json">([\s\S]*?)</script>')
@@ -19,7 +24,7 @@ function ConvertTo-PageArray {
     return $pages
 }
 
-function Add-LinkInTextOnly {
+function Add-LinksInTextOnly {
     param(
         [string]$Html,
         [string]$Term,
@@ -27,25 +32,35 @@ function Add-LinkInTextOnly {
         [string]$CurrentId
     )
 
-    if ($TargetId -eq $CurrentId) { return @{ html = $Html; changed = $false } }
-    if ($Html.Contains("href=""#$TargetId""")) { return @{ html = $Html; changed = $false } }
-    $pattern = "(?i)(?<![A-Za-zÇĞİÖŞÜçğıöşü])$([regex]::Escape($Term))(?![A-Za-zÇĞİÖŞÜçğıöşü])"
+    if ($TargetId -eq $CurrentId) { return @{ html = $Html; count = 0 } }
+
+    $pattern = "(?i)(?<![\p{L}\p{Nd}])$([regex]::Escape($Term))(?![\p{L}\p{Nd}])"
     $parts = [regex]::Split($Html, '(<a\b[\s\S]*?</a>|<[^>]+>)')
+    $count = 0
 
     for ($i = 0; $i -lt $parts.Count; $i++) {
         $part = $parts[$i]
         if (-not $part -or $part[0] -eq '<') { continue }
         if ($part -notmatch $pattern) { continue }
-        $parts[$i] = [regex]::Replace($part, $pattern, '<a href="#' + $TargetId + '">$0</a>', 1)
-        return @{ html = ($parts -join ""); changed = $true }
+
+        $localCount = 0
+        $parts[$i] = [regex]::Replace($part, $pattern, {
+            param($m)
+            $script:tradepediaLinkCount++
+            '<a href="#' + $TargetId + '">' + $m.Value + '</a>'
+        })
+        $localCount = $script:tradepediaLinkCount
+        $script:tradepediaLinkCount = 0
+        $count += $localCount
     }
 
-    return @{ html = $Html; changed = $false }
+    return @{ html = ($parts -join ""); count = $count }
 }
 
 $terms = @(
     @{ term = "Likidite"; id = "likidite" },
-    @{ term = "Risk Yönetimi"; id = "risk-management" },
+    @{ term = (S 0x0052,0x0069,0x0073,0x006B,0x0020,0x0059,0x00F6,0x006E,0x0065,0x0074,0x0069,0x006D,0x0069); id = "risk-management" },
+    @{ term = (S 0x0072,0x0069,0x0073,0x006B,0x0020,0x0079,0x00F6,0x006E,0x0065,0x0074,0x0069,0x006D,0x0069,0x0079,0x006C,0x0065); id = "risk-management" },
     @{ term = "Backtest"; id = "backtest" },
     @{ term = "Trend"; id = "trend" },
     @{ term = "Hacim"; id = "hacim-kavram" },
@@ -71,10 +86,10 @@ foreach ($page in $pages) {
     $changedThisPage = $false
     foreach ($item in $terms) {
         if (-not $ids.ContainsKey($item.id)) { continue }
-        $result = Add-LinkInTextOnly -Html $page.html -Term $item.term -TargetId $item.id -CurrentId $page.id
-        if ($result.changed) {
+        $result = Add-LinksInTextOnly -Html $page.html -Term $item.term -TargetId $item.id -CurrentId $page.id
+        if ($result.count -gt 0) {
             $page.html = $result.html
-            $linkCount++
+            $linkCount += $result.count
             $changedThisPage = $true
         }
     }
