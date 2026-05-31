@@ -18,9 +18,15 @@ Custom GPT setup:
 1. Create a fine-grained GitHub token for this repository.
 2. Give it read/write repository contents access.
 3. In the GPT editor, add an Action.
-4. Paste `openapi-github-free.yaml`.
+4. Paste `openapi-github-free.yaml`, or import the public schema URL after Pages deploys:
+
+```text
+https://chaoslightnight2-ctrl.github.io/Shorts-blogger/tradepedia-gpt-action-openapi.yaml
+```
 5. Set authentication to API key / Bearer and paste the GitHub token.
 6. On mobile, use that Custom GPT and say what article to add.
+
+Paste `CUSTOM_GPT_INSTRUCTIONS.md` into the GPT instruction field.
 
 Prompt example:
 

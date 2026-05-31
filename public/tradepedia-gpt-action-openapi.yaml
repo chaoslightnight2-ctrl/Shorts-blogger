@@ -1,0 +1,91 @@
+openapi: 3.1.0
+info:
+  title: Tradepedia Free Mobile Updater
+  version: 1.0.0
+  description: Free Custom GPT Action that triggers a GitHub Actions workflow to update Tradepedia.
+servers:
+  - url: https://api.github.com
+paths:
+  /repos/chaoslightnight2-ctrl/Shorts-blogger/dispatches:
+    post:
+      operationId: addOrUpdateTradepediaEntry
+      summary: Add or update a Tradepedia article through GitHub Actions.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - event_type
+                - client_payload
+              properties:
+                event_type:
+                  type: string
+                  enum:
+                    - tradepedia-entry
+                  default: tradepedia-entry
+                client_payload:
+                  type: object
+                  required:
+                    - title
+                    - kind
+                    - category
+                    - summary
+                    - body
+                  properties:
+                    id:
+                      type: string
+                      description: Optional stable slug. If omitted, generated from title.
+                    title:
+                      type: string
+                      description: Article title shown in Tradepedia.
+                    kind:
+                      type: string
+                      description: Type such as Kavram, Indikator, Formasyon, Emir Tipi.
+                    category:
+                      type: string
+                      description: Category such as Momentum, Risk, Hacim, Piyasa Yapisi.
+                    level:
+                      type: string
+                      description: Optional level such as Baslangic, Orta, Ileri.
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    summary:
+                      type: string
+                      description: Short article summary.
+                    body:
+                      type: string
+                      description: Main article body. Plain text is preferred.
+                    usage:
+                      type: string
+                      description: Optional usage notes.
+                    pitfalls:
+                      type: string
+                      description: Optional common mistakes.
+                    botNote:
+                      type: string
+                      description: Optional bot or backtest note.
+                    related:
+                      type: array
+                      items:
+                        type: string
+                    replaceExisting:
+                      type: boolean
+                      default: true
+      responses:
+        "204":
+          description: GitHub accepted the update request. The workflow will update and publish Tradepedia.
+        "401":
+          description: GitHub token is missing or invalid.
+        "404":
+          description: Repository not found or token has no access.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
