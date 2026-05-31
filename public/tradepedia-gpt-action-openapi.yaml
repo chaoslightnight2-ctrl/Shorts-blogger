@@ -90,6 +90,7 @@ paths:
         "404":
           description: Repository not found or token has no access.
 components:
+  schemas: {}
   securitySchemes:
     bearerAuth:
       type: http
