@@ -15,6 +15,7 @@ Kurallar:
 - `summary` tek paragraf olsun.
 - `body` ana açıklama olsun.
 - Mümkünse `usage`, `pitfalls`, `botNote`, `related` alanlarını da doldur.
+- `sources` alanına yalnızca kontrol ettiğin Wikipedia URL'lerini ekle. Wikipedia ile doğrulayamadığın bilgiyi kesin ifade etme.
 - Kullanıcı açıkça "güncelleme" istemese bile aynı başlık varsa `replaceExisting: true` kullan.
 - Action başarılı olursa kullanıcıya "istek GitHub Actions'a gönderildi, birkaç dakika içinde uygulamada görünür" de.
 
@@ -36,6 +37,12 @@ Kurallar:
       "pitfalls": "Her boşluğu otomatik işlem sinyali sanmak hatadır. Güçlü haber akışında veya düşük likiditede boşluklar güvenilir çalışmayabilir.",
       "botNote": "Backtestte FVG tespiti yalnızca kapanmış mumlarla yapılmalı, gelecekte oluşacak mum bilgisi kullanılmamalıdır.",
       "related": ["Likidite", "Order Flow", "Breakout", "Risk Yönetimi"],
+      "sources": [
+        {
+          "title": "Market microstructure",
+          "url": "https://en.wikipedia.org/wiki/Market_microstructure"
+        }
+      ],
       "replaceExisting": true
     }
   }

@@ -62,6 +62,7 @@ function buildEntry(payload) {
   const level = cleanText(payload.level || "Başlangıç");
   const tags = Array.isArray(payload.tags) ? payload.tags.map(cleanText).filter(Boolean) : [];
   const related = Array.isArray(payload.related) ? payload.related.map(cleanText).filter(Boolean) : [];
+  const sources = Array.isArray(payload.sources) ? payload.sources.map(normalizeSource).filter(Boolean) : [];
 
   const html = [
     `<article class="entry" id="${escapeAttr(id)}">`,
@@ -73,6 +74,7 @@ function buildEntry(payload) {
     payload.usage ? section(id, "kullanim", "Nasıl kullanılır?", payload.usage) : "",
     payload.pitfalls ? section(id, "tuzak", "Yanlış kullanım", payload.pitfalls) : "",
     payload.botNote ? section(id, "bot", "Bot / backtest notu", payload.botNote) : "",
+    sources.length ? sourceSection(id, sources) : "",
     related.length ? relatedSection(id, related) : "",
     `</article>`
   ].join("");
@@ -90,6 +92,26 @@ function relatedSection(id, related) {
     return `<a href="#${escapeAttr(href)}">${escapeHtml(item)}</a>`;
   }).join(" · ");
   return `<section id="${escapeAttr(id)}-ilgili"><h3>Bağlantılı maddeler</h3><div class="related">${links}</div></section>`;
+}
+
+function sourceSection(id, sources) {
+  const items = sources.map(source => {
+    return `<li><a href="${escapeAttr(source.url)}" rel="noopener" target="_blank">${escapeHtml(source.title)}</a></li>`;
+  }).join("");
+  return `<section class="audit-section" id="${escapeAttr(id)}-son-kontrol"><h3>Son kontrol ve kaynak denetimi</h3><p><b>Denetim durumu:</b> Bu madde Wikipedia kaynaklarıyla kontrol edilerek yazılmıştır.</p><div class="source-box"><b>Kontrol edilen ana Wikipedia kaynakları:</b><ol>${items}</ol></div></section>`;
+}
+
+function normalizeSource(source) {
+  if (typeof source === "string") {
+    if (!source.startsWith("https://en.wikipedia.org/wiki/")) return null;
+    return { title: decodeURIComponent(source.split("/wiki/")[1] || source).replace(/_/g, " "), url: source };
+  }
+  if (!source || typeof source.url !== "string") return null;
+  if (!source.url.startsWith("https://en.wikipedia.org/wiki/")) return null;
+  return {
+    title: cleanText(source.title || decodeURIComponent(source.url.split("/wiki/")[1] || source.url).replace(/_/g, " ")),
+    url: source.url
+  };
 }
 
 function paragraphs(text) {

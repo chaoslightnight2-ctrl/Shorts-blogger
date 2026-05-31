@@ -79,6 +79,19 @@ paths:
                           type: array
                           items:
                             type: string
+                        sources:
+                          type: array
+                          description: Wikipedia source URLs used to verify the entry.
+                          items:
+                            type: object
+                            required:
+                              - title
+                              - url
+                            properties:
+                              title:
+                                type: string
+                              url:
+                                type: string
                         replaceExisting:
                           type: boolean
                           default: true
